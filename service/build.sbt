@@ -10,3 +10,5 @@ libraryDependencies ++= Seq(
   http4s.dsl, http4s.server, http4s.client,
   _test(scalaTest)
 )
+
+settings.common

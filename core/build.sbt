@@ -8,3 +8,5 @@ libraryDependencies ++= Seq(
   tconfig,
   _test(scalaTest)
 )
+
+settings.common
