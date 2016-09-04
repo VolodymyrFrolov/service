@@ -3,7 +3,6 @@ scala:
   - 2.11.8
 jdk:
   - oraclejdk7
-  - openjdk6
 branches:
   only:
     - master
