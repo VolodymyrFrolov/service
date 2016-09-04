@@ -2,6 +2,11 @@ import sbt._, Keys._
 
 object dependencies {
 
+  val repositories = Seq(
+    "Typesafe"           at "http://repo.typesafe.com/typesafe/releases/",
+    "Oncue Bintray Repo" at "http://dl.bintray.com/oncue/releases"
+  )
+
   def _provided (m: ModuleID): ModuleID = m % "provided"
   def _test     (m: ModuleID): ModuleID = m % "test"
 

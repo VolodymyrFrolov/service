@@ -39,6 +39,10 @@ object settings {
     scalacOptions in Compile ++= compilerFlags ++ lintingFlags
   )
 
-  def common = console.settings ++ compiler
+  def resolution = Seq(
+    resolvers ++= dependencies.repositories
+  )
+
+  def common = console.settings ++ compiler ++ resolution
 
 }
