@@ -12,7 +12,7 @@ object dependencies {
 
   object Versions {
     val scalaz    = "7.2.4"
-    val streams   = "0.8"
+    val streams   = "0.8.4"
     val kafka     = "0.9.0.0"
     val scalaTest = "2.2.6"
     val logback   = "1.1.2"
