@@ -1,14 +1,21 @@
 package kafka.console
 
-import org.http4s.{Request, Response}
+import org.http4s._
 
+import scalaz._, syntax.kleisli._
 import scalaz.concurrent.Task
 
 package object service {
 
-  type Controller = PartialFunction[Request, RuntimeK[Response]]
+  import model._
 
-  type ErrorHandler = PartialFunction[Throwable, Task[Response]]
+  type Controller         = PartialFunction[Request, RuntimeK[Response]]
+
+  type TypedController[A] = PartialFunction[Request, RuntimeK[A]]
+
+  type AuthController[A]  = PartialFunction[Request, Token => RuntimeK[A]]
+
+  type ErrorHandler       = PartialFunction[Throwable, Task[Response]]
 
 
 }
