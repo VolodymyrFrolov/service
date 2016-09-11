@@ -10,4 +10,5 @@ package object service {
 
   type ErrorHandler = PartialFunction[Throwable, Task[Response]]
 
+
 }

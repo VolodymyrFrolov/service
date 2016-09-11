@@ -7,7 +7,8 @@ libraryDependencies ++= Seq(
   logback,
   journal,
   tconfig,
-  http4s.dsl, http4s.server, http4s.client,
+  argonaut,
+  http4s.dsl, http4s.server, http4s.client, http4s.argo,
   _test(scalaTest)
 )
 
