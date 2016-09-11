@@ -1,3 +1,3 @@
 package kafka.console
 
-package object app extends Contexts with Data
+package object app extends Container with Data

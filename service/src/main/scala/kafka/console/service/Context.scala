@@ -4,7 +4,8 @@ package service
 import scalaz.concurrent.Task
 import config._
 import core.Container
-import core.services.TopicService
+import core.services.{SecurityService, TopicService}
+import kafka.console.model.Token
 import model.topics.Topic
 
 import scala.util.Random
@@ -24,6 +25,9 @@ object Context {
             )
           }.take(generator.nextInt(100)).toVector
         }
+      },
+      security = new SecurityService {
+        override def check (token: Token) = Task.delay { token }
       }
     )
   }

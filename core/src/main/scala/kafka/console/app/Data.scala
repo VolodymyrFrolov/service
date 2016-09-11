@@ -11,10 +11,6 @@ trait Data {
 
   private val topics: TopicsK[TopicService] = Kleisli.ask
 
-  val topicService: RuntimeK[TopicService] = for {
-    c <- container
-  } yield c.topics
-
   val getTopics: TopicsK[Vector[Topic]] = for {
     s <- topics
     t <- s.getTopics.liftKleisli
