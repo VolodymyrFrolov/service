@@ -1,4 +1,4 @@
-package kafka.console
+package kafka.console.logging
 
 import com.typesafe.config._
 

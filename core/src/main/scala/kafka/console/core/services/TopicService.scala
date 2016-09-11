@@ -7,6 +7,6 @@ import scalaz.concurrent.Task
 
 trait TopicService {
 
-  def getTopics: Task[Topic]
+  def getTopics: Task[Vector[Topic]]
 
 }

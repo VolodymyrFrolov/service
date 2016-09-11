@@ -1,3 +1,3 @@
 package kafka.console.service
 
-package object syntax extends Default with Implicits
+package object syntax extends Service
