@@ -12,4 +12,6 @@ libraryDependencies ++= Seq(
   _test(scalaTest)
 )
 
+assemblyJarName in assembly := s"${organization.value}.${version.value}.jar"
+
 settings.common

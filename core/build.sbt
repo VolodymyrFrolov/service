@@ -9,4 +9,6 @@ libraryDependencies ++= Seq(
   _test(scalaTest)
 )
 
+assembly := null
+
 settings.common
