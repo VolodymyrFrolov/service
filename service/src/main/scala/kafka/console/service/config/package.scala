@@ -17,7 +17,12 @@ package object config {
     )
   }
   def app(conf: Config) = Task.delay {
-    AppInfo()
+    AppInfo(
+      kafka = KafkaInfo(
+        host = conf.getString("application.kafka.host"),
+        port = conf.getInt("application.kafka.port")
+      )
+    )
   }
 
 
