@@ -1,4 +1,6 @@
-import sbt._, Keys._
+import sbt._
+import Keys._
+import sbtassembly.AssemblyPlugin.autoImport._
 
 object settings {
 
@@ -43,6 +45,13 @@ object settings {
     resolvers ++= dependencies.repositories
   )
 
+  def build = Seq(
+    assemblyJarName in assembly := s"${organization.value}.${version.value}.jar"
+  )
+
   def common = console.settings ++ compiler ++ resolution
 
+  def service = build
+
+  def nonService = Seq(assembly := null)
 }

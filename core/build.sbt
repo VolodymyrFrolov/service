@@ -9,6 +9,6 @@ libraryDependencies ++= Seq(
   _test(scalaTest)
 )
 
-assembly := null
+settings.nonService
 
 settings.common

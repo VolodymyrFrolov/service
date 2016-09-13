@@ -10,4 +10,6 @@ lazy val core    = project
 
 lazy val service = project.dependsOn(core % "test->test;compile->compile")
 
+settings.nonService
+
 settings.common
