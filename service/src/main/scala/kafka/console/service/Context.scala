@@ -1,31 +1,19 @@
 package kafka.console
 package service
 
+import kafka.console.model.Token
+import kafka.console.service.app.AppTopicService
+
 import scalaz.concurrent.Task
 import config._
 import core.Container
-import core.services.{SecurityService, TopicService}
-import kafka.console.model.Token
-import model.topics.Topic
-
-import scala.util.Random
+import core.services.{SecurityService}
 
 object Context {
 
-  def container(info: AppInfo) = Task.delay {
+  def container(info: AppInfo) = Task.now {
     Container(
-      topics = new TopicService {
-        private val generator = new Random()
-        override def getTopics = Task.delay {
-          Stream.continually {
-            Topic(
-              name = s"topic-${generator.nextInt()}",
-              partitions = 1,
-              replicationFactor = 1
-            )
-          }.take(generator.nextInt(100)).toVector
-        }
-      },
+      topics = new AppTopicService(info),
       security = new SecurityService {
         override def check (token: Token) = Task.delay { token }
       }

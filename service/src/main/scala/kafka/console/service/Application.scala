@@ -4,6 +4,9 @@ package service
 import journal.Logger
 import org.http4s.dsl._
 
+import scalaz.Kleisli
+import kafka.console.app._
+
 object Application {
 
   import content._, codecs._
@@ -18,7 +21,8 @@ object Application {
   }
 
   private val topics = exec {
-    case GET -> Root / "topics" => topicService andThen getTopics
+    case GET -> Root / "topics" =>
+       topicService andThen getTopics
   }
 
   private val authenticated = auth {
