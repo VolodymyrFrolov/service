@@ -1,4 +1,8 @@
-import sbt._, Keys._
+import sbt._
+import Keys._
+import sbtassembly.AssemblyPlugin.autoImport._
+import sbtdocker.DockerPlugin.autoImport._
+import sbtdocker.mutable.Dockerfile
 
 object settings {
 
@@ -43,6 +47,34 @@ object settings {
     resolvers ++= dependencies.repositories
   )
 
+  def build = Seq(
+    assemblyJarName in assembly := s"${organization.value}.${version.value}.jar",
+    dockerfile in docker := {
+      val artifact: File = assembly.value
+      val artifactTargetPath = s"/bin/${artifact.name}"
+      new Dockerfile {
+        from("tcnksm/centos-java")
+        maintainer(organization.value)
+        add(artifact, artifactTargetPath)
+        expose(8080)
+        entryPoint("java", "-jar", artifactTargetPath)
+      }
+    },
+    imageNames in docker := Seq(
+      ImageName(
+        namespace = Some(organization.value),
+        repository = name.value,
+        tag = Some("v" + version.value)
+      )
+    ),
+    buildOptions in docker := BuildOptions(
+      removeIntermediateContainers = BuildOptions.Remove.Always
+    )
+  )
+
   def common = console.settings ++ compiler ++ resolution
 
+  def service = build
+
+  def nonService = Seq(assembly := null)
 }
