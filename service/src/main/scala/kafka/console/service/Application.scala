@@ -27,9 +27,12 @@ object Application {
   }
 
   private val html = raw {
-    case GET -> Root / "html" =>
-      Ok(scalaz.stream.io.linesR(getClass.getClassLoader.getResource("webpage.html").getPath))
+    case GET -> Root / "html" => {
+      import scalaz.stream.io
+
+      Ok(io.linesR(getClass.getResourceAsStream("/webpage.html")))
         .withContentType(Some(`Content-Type`(org.http4s.MediaType.`text/html`)))
+    }
   }
 
   private val authenticated = auth {
