@@ -6,6 +6,7 @@ import org.http4s.dsl._
 
 import scalaz.Kleisli
 import kafka.console.app._
+import org.http4s.headers.`Content-Type`
 
 object Application {
 
@@ -25,6 +26,15 @@ object Application {
        topicService andThen getTopics
   }
 
+  private val html = raw {
+    case GET -> Root / "html" => {
+      import scalaz.stream.io
+
+      Ok(io.linesR(getClass.getResourceAsStream("/webpage.html")))
+        .withContentType(Some(`Content-Type`(org.http4s.MediaType.`text/html`)))
+    }
+  }
+
   private val authenticated = auth {
     case GET -> Root / "auth" / "topics" =>
       token => for {
@@ -33,5 +43,5 @@ object Application {
       } yield r
   }
 
-  val instance: Controller = status orElse topics orElse authenticated
+  val instance: Controller = status orElse topics orElse authenticated orElse html
 }
