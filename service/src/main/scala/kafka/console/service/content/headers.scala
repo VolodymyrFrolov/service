@@ -14,6 +14,6 @@ object headers {
 
   val AUTH: CharSequence = "token"
 
-  def tokenFrom(value: Header): RuntimeK[Token] = Task.delay { UUID.fromString(value.value) }.liftKleisli
+  def tokenFrom(header: Header): RuntimeK[Token] = Task.delay { header.value }
 
 }
