@@ -2,7 +2,6 @@ package kafka.console
 
 import org.http4s._
 
-import scalaz._, syntax.kleisli._
 import scalaz.concurrent.Task
 
 package object service {

@@ -6,7 +6,7 @@ import Scalaz._
 import scalaz.concurrent.Task
 import org.http4s._
 import dsl._
-
+import kafka.console.core.services.CheckToken
 import org.http4s.util.CaseInsensitiveString
 
 trait Service {
@@ -47,10 +47,11 @@ trait Service {
   }
 
   def authCore[A : EntityEncoder](body: AuthController[A])(req: Request, header: Header) = for {
-    t <- content.headers.tokenFrom(header)
-    _ <- security andThenK (_.check(t))
-    v <- body(req)(t)
-    r <- Ok(v)
-  } yield r
+    token    <- content.headers.tokenFrom(header)
+    service  <- security
+    _        <- service(CheckToken(token))
+    value    <- body(req)(token)
+    result   <- Ok(value)
+  } yield result
 
 }
