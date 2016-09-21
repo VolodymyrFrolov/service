@@ -2,9 +2,11 @@ package kafka.console
 package service
 
 import journal.Logger
+import kafka.console.core.services.{GetTopicDetails, ListTopics}
+import org.http4s.Response
 import org.http4s.dsl._
+import scalaz.concurrent._
 
-import scalaz.Kleisli
 import kafka.console.app._
 import org.http4s.headers.`Content-Type`
 
@@ -23,7 +25,21 @@ object Application {
 
   private val topics = exec {
     case GET -> Root / "topics" =>
-       topicService andThen getTopics
+      for {
+        _ <- info("Requesting topics list")
+        service <- topicService
+        r <- service(ListTopics())
+      } yield r
+  }
+
+  private val topicDetails = raw {
+    case GET -> Root / "topics" / name =>
+      for {
+        _ <- info(s"Requesting topic '$name' details")
+        service <- topicService
+        r <- service(GetTopicDetails(name))
+        c <- r.fold(Task.now { Response(NotFound) })(Ok(_))
+      } yield c
   }
 
   private val html = raw {
@@ -39,9 +55,10 @@ object Application {
     case GET -> Root / "auth" / "topics" =>
       token => for {
         _ <- info(s"request to secured resource with token $token")
-        r <- topicService andThen getTopics
+        service <- topicService
+        r <- service(ListTopics())
       } yield r
   }
 
-  val instance: Controller = status orElse topics orElse authenticated orElse html
+  val instance: Controller = status orElse topics orElse topicDetails orElse authenticated orElse html
 }
