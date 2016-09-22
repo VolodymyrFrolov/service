@@ -6,7 +6,7 @@ import org.http4s.dsl._
 
 import scalaz.Kleisli
 import kafka.console.app._
-import org.http4s.headers.`Content-Type`
+import org.http4s._
 
 object Application {
 
@@ -30,7 +30,7 @@ object Application {
     case GET -> Root / "html" => {
       import scalaz.concurrent.Task
 
-      org.http4s.StaticFile.fromResource("/webpage.html").fold(NotFound())(Task.now)
+      StaticFile.fromResource("/webpage.html").fold(NotFound())(Task.now)
     }
   }
 
