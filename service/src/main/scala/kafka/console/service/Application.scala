@@ -28,10 +28,9 @@ object Application {
 
   private val html = raw {
     case GET -> Root / "html" => {
-      import scalaz.stream.io
+      import scalaz.concurrent.Task
 
-      Ok(io.linesR(getClass.getResourceAsStream("/webpage.html")))
-        .withContentType(Some(`Content-Type`(org.http4s.MediaType.`text/html`)))
+      org.http4s.StaticFile.fromResource("/webpage.html").fold(NotFound())(Task.now)
     }
   }
 
