@@ -6,7 +6,7 @@ import org.http4s.dsl._
 
 import scalaz.Kleisli
 import kafka.console.app._
-import org.http4s.headers.`Content-Type`
+import org.http4s._
 
 object Application {
 
@@ -28,10 +28,9 @@ object Application {
 
   private val html = raw {
     case GET -> Root / "html" => {
-      import scalaz.stream.io
+      import scalaz.concurrent.Task
 
-      Ok(io.linesR(getClass.getResourceAsStream("/webpage.html")))
-        .withContentType(Some(`Content-Type`(org.http4s.MediaType.`text/html`)))
+      StaticFile.fromResource("/webpage.html").fold(NotFound())(Task.now)
     }
   }
 
