@@ -12,6 +12,6 @@ libraryDependencies ++= Seq(
   _test(scalaTest)
 )
 
-settings.service
-
 settings.common
+
+settings.dockerSettings
