@@ -2,10 +2,8 @@ package kafka.console
 package service
 
 import journal.Logger
-import kafka.console.core.services.{GetTopicDetails, ListTopics}
-import org.http4s.Response
+import kafka.console.core.services.{ListPartitions, GetTopicDetails, ListTopics}
 import org.http4s.dsl._
-import scalaz.concurrent._
 
 import kafka.console.app._
 import org.http4s._
@@ -23,22 +21,29 @@ object Application {
     case GET -> Root / "status" => Ok("works just fine")
   }
 
-  private val topics = exec {
+  private val topics = raw {
     case GET -> Root / "topics" =>
       for {
         _ <- info("Requesting topics list")
         service <- topicService
-        r <- service(ListTopics())
+        t <- service(ListTopics())
+        r <- Ok(t)
       } yield r
-  }
 
-  private val topicDetails = raw {
     case GET -> Root / "topics" / name =>
       for {
         _ <- info(s"Requesting topic '$name' details")
         service <- topicService
         r <- service(GetTopicDetails(name))
-        c <- r.fold(Task.now { Response(NotFound) })(Ok(_))
+        c <- okOrNotFound(r)
+      } yield c
+
+    case GET -> Root / "topics" / name / "partitions" =>
+      for {
+        _ <- info(s"Requesting topic '$name' partitions")
+        service <- topicService
+        r <- service(ListPartitions(name))
+        c <- okOrNotFound(r)
       } yield c
   }
 
@@ -59,5 +64,5 @@ object Application {
       } yield r
   }
 
-  val instance: Controller = status orElse topics orElse topicDetails orElse authenticated orElse html
+  val instance: Controller = status orElse topics orElse authenticated orElse html
 }
