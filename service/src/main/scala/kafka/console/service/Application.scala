@@ -2,11 +2,13 @@ package kafka.console
 package service
 
 import journal.Logger
-import kafka.console.core.services.{ListPartitions, GetTopicDetails, ListTopics}
+import kafka.console.core.services.{GetPartition, ListPartitions, GetTopicDetails, ListTopics}
 import org.http4s.dsl._
 
 import kafka.console.app._
 import org.http4s._
+
+import scalaz.concurrent.Task
 
 object Application {
 
@@ -26,7 +28,7 @@ object Application {
       for {
         _ <- info("Requesting topics list")
         service <- topicService
-        t <- service(ListTopics())
+        t <- service(ListTopics)
         r <- Ok(t)
       } yield r
 
@@ -35,7 +37,7 @@ object Application {
         _ <- info(s"Requesting topic '$name' details")
         service <- topicService
         r <- service(GetTopicDetails(name))
-        c <- okOrNotFound(r)
+        c <- r.fold(Task.now { Response(NotFound) })(Ok(_))
       } yield c
 
     case GET -> Root / "topics" / name / "partitions" =>
@@ -43,7 +45,15 @@ object Application {
         _ <- info(s"Requesting topic '$name' partitions")
         service <- topicService
         r <- service(ListPartitions(name))
-        c <- okOrNotFound(r)
+        c <- r.fold(Task.now { Response(NotFound) })(Ok(_))
+      } yield c
+
+    case GET -> Root / "topics" / name / "partitions"/ IntVar(partitionId) =>
+      for {
+        _ <- info(s"Requesting topic '$name' partition '$partitionId'")
+        service <- topicService
+        r <- service(GetPartition(name, partitionId))
+        c <- r.fold(Task.now { Response(NotFound) })(Ok(_))
       } yield c
   }
 
@@ -60,7 +70,7 @@ object Application {
       token => for {
         _ <- info(s"request to secured resource with token $token")
         service <- topicService
-        r <- service(ListTopics())
+        r <- service(ListTopics)
       } yield r
   }
 

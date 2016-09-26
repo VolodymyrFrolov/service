@@ -40,13 +40,18 @@ final class AppTopicService(info: AppInfo) extends TopicService with ToKafkaConf
     if (partitions isEmpty) None else Some(partitions)
   }
 
+  private def getTopicPartition(topic: String, partitionId: Int) = for {
+    partitions <- getTopicPartitions(topic)
+    p = partitions flatMap { _.find (_.partition == partitionId) }
+  } yield p
+
   private def getTopicDetails(name: String) = for {
     ps <- getTopicPartitions(name)
     d = ps map (TopicDetails(name, _))
   } yield d
 
   override def apply[A](fa: TopicOps[A]): RuntimeK[A] = fa match {
-    case ListTopics() => for {
+    case ListTopics => for {
       _ <- container
       t <- getTopics
     } yield t
@@ -58,5 +63,10 @@ final class AppTopicService(info: AppInfo) extends TopicService with ToKafkaConf
       c <- container
       tp <- getTopicPartitions(name)
     } yield tp
+    case GetPartition(name, partitionId) => for {
+      c <- container
+      tp <- getTopicPartition(name, partitionId)
+    } yield tp
+
   }
 }

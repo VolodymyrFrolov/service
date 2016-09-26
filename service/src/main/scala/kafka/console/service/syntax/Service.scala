@@ -53,7 +53,4 @@ trait Service {
     value    <- body(req)(token)
     result   <- Ok(value)
   } yield result
-
-  def okOrNotFound[A: EntityEncoder](result: Option[A]) =
-    result.fold(Task.now { Response(NotFound) })(Ok(_))
 }
