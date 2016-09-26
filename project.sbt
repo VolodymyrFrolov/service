@@ -8,6 +8,4 @@ lazy val core    = project
 
 lazy val service = project.enablePlugins(sbtdocker.DockerPlugin).dependsOn(core % "test->test;compile->compile")
 
-settings.nonService
-
 settings.common
