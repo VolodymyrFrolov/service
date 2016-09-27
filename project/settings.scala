@@ -47,24 +47,23 @@ object settings {
     resolvers ++= dependencies.repositories
   )
 
-  def build = Seq(
-    assemblyJarName in assembly := s"${organization.value}.${version.value}.jar",
-    dockerfile in docker := {
-      val artifact: File = assembly.value
-      val artifactTargetPath = s"/bin/${artifact.name}"
-      new Dockerfile {
-        from("tcnksm/centos-java")
-        maintainer(organization.value)
-        add(artifact, artifactTargetPath)
-        expose(8080)
-        entryPoint("java", "-jar", artifactTargetPath)
-      }
-    },
+  def dockerSettings = Seq(
+      dockerfile in docker := {
+        val artifact: File = assembly.value
+        val artifactTargetPath = s"/bin/${artifact.name}"
+        new Dockerfile {
+          from("tcnksm/centos-java")
+          maintainer(organization.value)
+          add(artifact, artifactTargetPath)
+          expose(8080)
+          entryPoint("java", "-jar", artifactTargetPath)
+        }
+      },
     imageNames in docker := Seq(
       ImageName(
         namespace = Some(organization.value),
         repository = name.value,
-        tag = Some("v" + version.value)
+        tag = Some("latest")
       )
     ),
     buildOptions in docker := BuildOptions(
@@ -72,9 +71,11 @@ object settings {
     )
   )
 
-  def common = console.settings ++ compiler ++ resolution
+  def publishing = Seq(
+    publishTo := bintray.getPublishResolver(System.getenv("BINTRAY_USER"), System.getenv("BINTRAY_API_KEY"), moduleName.value, false)
+  )
 
-  def service = build
+  def common = console.settings ++ compiler ++ resolution ++ publishing
 
-  def nonService = Seq(assembly := null)
+  def deploy = dockerSettings
 }
