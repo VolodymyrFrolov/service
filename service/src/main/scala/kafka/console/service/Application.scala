@@ -2,11 +2,11 @@ package kafka.console
 package service
 
 import journal.Logger
-import kafka.console.core.services.{GetTopicDetails, ListTopics}
+import kafka.console.core.services.{GetTopicDetails, ListTopics, GetMetrics}
 import org.http4s.Response
 import org.http4s.dsl._
-import scalaz.concurrent._
 
+import scalaz.concurrent._
 import kafka.console.app._
 import org.http4s._
 
@@ -32,13 +32,34 @@ object Application {
       } yield r
   }
 
+  object NameMatcher extends OptionalQueryParamDecoderMatcher[String]("name")
+  object ClientIdMatcher extends OptionalQueryParamDecoderMatcher[String]("clientId")
+  object AttributesMatcher extends OptionalQueryParamDecoderMatcher[String]("attributes")
+
+  private val monitoring = exec {
+
+    case GET -> Root / "monitoring" / domain / mtype :? NameMatcher(name) +& ClientIdMatcher(clientId) +& AttributesMatcher(attributes) => {
+      val attrs = attributes match {
+        case Some(a) => a.split(",").toList
+        case _ => Nil
+      }
+      for {
+        _ <- info(s"Requesting monitoring: '$domain' -> '$mtype' -> '$name' -> '$clientId'")
+        service <- monitoringService
+        r <- service(GetMetrics(domain, mtype, Map("name" -> name, "client-id" -> clientId), attrs))
+      } yield r
+    }
+  }
+
   private val topicDetails = raw {
     case GET -> Root / "topics" / name =>
       for {
         _ <- info(s"Requesting topic '$name' details")
         service <- topicService
         r <- service(GetTopicDetails(name))
-        c <- r.fold(Task.now { Response(NotFound) })(Ok(_))
+        c <- r.fold(Task.now {
+          Response(NotFound)
+        })(Ok(_))
       } yield c
   }
 
@@ -59,5 +80,5 @@ object Application {
       } yield r
   }
 
-  val instance: Controller = status orElse topics orElse topicDetails orElse authenticated orElse html
+  val instance: Controller = status orElse topics orElse topicDetails orElse monitoring orElse authenticated orElse html
 }

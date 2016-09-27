@@ -15,6 +15,10 @@ trait Container {
     c => Task.delay { c.topics }
   }
 
+  val monitoringService: RuntimeK[MonitoringService] = container.andThenK {
+    c => Task.delay {c.monitoring}
+  }
+
   val security: RuntimeK[SecurityService]  = container.andThenK {
     c => Task.delay { c.security }
   }
