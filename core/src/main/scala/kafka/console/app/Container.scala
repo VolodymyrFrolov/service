@@ -12,10 +12,14 @@ trait Container {
   val container: RuntimeK[core.Container] = Kleisli.ask
 
   val topicService: RuntimeK[TopicService] = container.andThenK {
-    c => Task.delay { c.topics }
+    c => Task.now { c.topics }
+  }
+
+  val monitoringService: RuntimeK[MonitoringService] = container.andThenK {
+    c => Task.now {c.monitoring}
   }
 
   val security: RuntimeK[SecurityService]  = container.andThenK {
-    c => Task.delay { c.security }
+    c => Task.now { c.security }
   }
 }

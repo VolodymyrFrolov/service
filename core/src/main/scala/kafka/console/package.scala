@@ -11,6 +11,8 @@ package object console {
 
   type TopicsK[U]  = Kleisli[Task, TopicService, U]
 
+  type MonitoringK[U]  = Kleisli[Task, MonitoringService, U]
+
   val container: RuntimeK[Container] = Kleisli.ask
 
   implicit def wrapK[A](value: Task[A]): RuntimeK[A] = value.liftKleisli

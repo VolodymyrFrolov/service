@@ -12,7 +12,8 @@ object Context {
   def container(info: AppInfo) = Task.now {
     Container(
       topics   = new AppTopicService(info),
-      security = new AppSecurityService
+      security = new AppSecurityService,
+      monitoring = new AppMonitoringService
     )
   }
 
