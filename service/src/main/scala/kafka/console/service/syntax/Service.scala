@@ -53,5 +53,4 @@ trait Service {
     value    <- body(req)(token)
     result   <- Ok(value)
   } yield result
-
 }

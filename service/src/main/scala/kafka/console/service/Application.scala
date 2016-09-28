@@ -4,11 +4,14 @@ package service
 import journal.Logger
 import kafka.console.core.services.{GetTopicDetails, ListTopics, GetMetrics}
 import org.http4s.Response
+import kafka.console.core.services.{GetPartition, ListPartitions, GetTopicDetails, ListTopics}
 import org.http4s.dsl._
 
 import scalaz.concurrent._
 import kafka.console.app._
 import org.http4s._
+
+import scalaz.concurrent.Task
 
 object Application {
 
@@ -23,16 +26,15 @@ object Application {
     case GET -> Root / "status" => Ok("works just fine")
   }
 
-  private val topics = exec {
+  private val topics = raw {
     case GET -> Root / "topics" =>
       for {
         _ <- info("Requesting topics list")
         service <- topicService
-        r <- service(ListTopics())
+        t <- service(ListTopics)
+        r <- Ok(t)
       } yield r
   }
-
-
 
   private val monitoring = exec {
 
@@ -59,6 +61,22 @@ object Application {
           Response(NotFound)
         })(Ok(_))
       } yield c
+
+    case GET -> Root / "topics" / name / "partitions" =>
+      for {
+        _ <- info(s"Requesting topic '$name' partitions")
+        service <- topicService
+        r <- service(ListPartitions(name))
+        c <- r.fold(Task.now { Response(NotFound) })(Ok(_))
+      } yield c
+
+    case GET -> Root / "topics" / name / "partitions"/ IntVar(partitionId) =>
+      for {
+        _ <- info(s"Requesting topic '$name' partition '$partitionId'")
+        service <- topicService
+        r <- service(GetPartition(name, partitionId))
+        c <- r.fold(Task.now { Response(NotFound) })(Ok(_))
+      } yield c
   }
 
   private val html = raw {
@@ -74,7 +92,7 @@ object Application {
       token => for {
         _ <- info(s"request to secured resource with token $token")
         service <- topicService
-        r <- service(ListTopics())
+        r <- service(ListTopics)
       } yield r
   }
 
