@@ -1,3 +1,3 @@
 package kafka.console.service
 
-package object syntax extends Service with Http with Logging
+package object syntax extends Service with Http with Logging with Parameters

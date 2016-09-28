@@ -32,9 +32,7 @@ object Application {
       } yield r
   }
 
-  object NameMatcher extends OptionalQueryParamDecoderMatcher[String]("name")
-  object ClientIdMatcher extends OptionalQueryParamDecoderMatcher[String]("clientId")
-  object AttributesMatcher extends OptionalQueryParamDecoderMatcher[String]("attributes")
+
 
   private val monitoring = exec {
 
