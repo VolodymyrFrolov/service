@@ -15,7 +15,7 @@ object MBeanInfoProvider {
         .map(_.asInstanceOf[ObjectInstance])
         .map(_.getObjectName())
         .filter(_.getDomain.startsWith("kafka."))
-        .map(a => MBeanMetricInfo(a, a.getDomain, extractSortedCanonicalKeys(a), mbcs.getMBeanInfo(a)))
+        .map(a => MBeanMetricInfo(a, a.getDomain, getMetricType(a), extractSortedCanonicalKeys(a), mbcs.getMBeanInfo(a)))
     }
     }
   }
@@ -24,6 +24,11 @@ object MBeanInfoProvider {
     canonicalNameKeyListToMap(a.getCanonicalKeyPropertyListString)
       .map(a => a._1 + "=" + a._2).mkString(",")
   }
+
+  private def getMetricType(a: ObjectName) = canonicalNameKeyListToMap(a.getCanonicalKeyPropertyListString)
+    .find(_._1 == "type")
+    .map(_._2)
+    .getOrElse("unknown")
 
   private def canonicalNameKeyListToMap(canonicalName: String) = canonicalName.split(',').sorted.map { a =>
     val Array(left, right) = a.split('=')
