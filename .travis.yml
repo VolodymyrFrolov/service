@@ -1,15 +1,18 @@
 language: scala
 scala:
 - 2.11.8
-sudo: false
+sudo: required
+services:
+- docker
 cache:
   directories:
-    - $HOME/.ivy2/cache
-    - $HOME/.sbt/boot/
+  - "$HOME/.ivy2/cache"
+  - "$HOME/.sbt/boot/"
+before_install:
+- docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
 before_cache:
-  # Tricks to avoid unnecessary cache updates
-  - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
-  - find $HOME/.sbt -name "*.lock" -delete
+- find $HOME/.ivy2 -name "ivydata-*.properties" -delete
+- find $HOME/.sbt -name "*.lock" -delete
 jdk:
 - oraclejdk7
 branches:
@@ -19,6 +22,7 @@ env:
   global:
   - secure: YsOIDt6BoeMF/w7rN6xPj3XbiRwLA8oBoUAi1+VeS9dSnmYfnrMFvJxKAJoZrfKZ75wPIjuizDFpkbx7tX8szJDscds9rpA2WBMkq1PcPCjus2LPs9xZ2s0i/21v0LJuPU8c7jWbl7uOFzNcjBW6ttSivEA4U4B023m2VbJU9hLIrzpWRxH4tacbfIcklNEBvyiYVGk75ypXf3tGu5FnjSS1eAfNihRGF6DYJYH8SLREb4u/00Wj0bRZwP3Zk2Hzozf2TPB9crQYStxmSjTJXv9bHHFPJLuZEOsf3aJC8m17iB7947eLjTmtJv6rKe9d3ckG4Uh8xwI5ekHHmHI6MBsFIsOfMOMSqUmPDmaCixLgf82aaXKo5EvfrRGLnWw7hrRN0+pmGsNcS3Di2o9xn+pgUpMhDPX+TyWW21ZxOy7PWaQlvZoLuH/PMYYL/Z9+f+HZzHeCcaNkK0FyU1JScA64IKN/qtUkWeKc1ixqjFpVHTZS6rMtV0+je+URwVB3b4acPw2wYjE64LDl3sZ5weVFD77UlOtPSui0tRBRDG+X9JT/qNHKt7PbDi0qF/+XPRnF2Y/1y0ZsVA2xNocf6Z6fupJx7djK6RdpvpPOyeop3TViU6/5rwwoBI3s2RSkxgyjQ5DNgQZwDAtLFqJ4roLDyi47x26kuSqbAXrBn94=
   - secure: glSnoRs0ksfTqNgFrEnunVkZe+Ds7F4zKmwFykrydDg9wySZyiW7NBxJ+x2UvmPcGzaJAaIQ2dqAiwgtL0DGW8cllXCNra2N1P1RrgmR3wJdOaCicpreTmXlCgU7t817UPisWxDGgbzuA8HUSziAWew2gIAKBmdi3iOYFTpsnWmYZylUunrXRR9O4rcOy6Sm2pW2DXtvcP/xfc6hqEdlV4f+qsPl9z1HJFe4sFgfOJxFfibWXIb5z2X6ED+Ne4yFGq6BoTrvaHYlzddremZ98fsXVkDXVJmu1CyfAgkCjiZQTs80SKY/Hqcwewe25XLafWAkr9t1GA0PRKO1q4YNRs/AV0QOYdgeq6oNroDUqEt2QC4qH4G+ljogKgDnV1BdyQhd5KKwjBDgPEDY115JaXvYPgA8NVCsH7DJDxShCc6384Ce3tk4pjxXOhP2NGSyQ+sWhbihatapQc0+uvQYuuXvqYPQaQyriW3SSaOmwtSnWB5uRisEVq3iex8uAF8zkSa2yNP/YGapC/nXV7htVhy2A5DwUOAbklTzNBuQRjIPZrCe3/h21Frc1nDmV8uZEAtfAa6IZXcIyjP4vOJ6Rxd3J5MKrzWJ/2Sc2hCweEjJJpgDK6W0MbC0OlMuDlNxmHHagvZH7b40j0hB6iHDAMMwV7Mh6mQoWeTXcS8PFRU=
+  - secure: Go3I4eeeIgi2XtSZLh9SRtFedjhN5mMxyieoSLFuTLBBZqVJXaX9+9aYMPYPNUxDRGgC8dKikhiAUbGivQahuEzZ8ll9n1rgInZXGLNwAYxJsnarcnfygyY0qsAXMslh6La8yLm9lSiczLXo+A6ozdUX5VvnND6S+9hO9GGlefY9wJnLBpAgrqEcM83tw0EOLYptCP2O3lSq4VJ18AvTZctlD3ULL/nkkcUo71hfLS658cmMFuwd+ts4q0beEQQVJINt3UuWRZnbgRa1cSR3j8JDtq7FrPl1GSQHwvtfQi41sZ8PEl0WWY/3tDM3+AxXkT0NrM3Kh2wzIu6UH7nU87RLZyd/PsgoCCR+LjzjTbOYHHhrUegw4W+WI/PcEjpsuJvki76H14fRrfQleNvGufgS/GQzIQkJ7LhRm7CW08TSHimuf4fW2G1FMz4cxdqfS/2hi5f26j/A3s1TDa86Q1y3hP0EX4LQWbb6YnwWZ5zfsmwUBjzQ6ZeK7TGRfMfpXbPY+ZIEaCV5Xla8uPP1/jPHBDLnd6zJqT0wTuchzivW/C1GlKdmAzeMiVEAw1FQ+aXnSa3C2SjxuSw+jPY3XdCTQpaHaa0gqj5KJ4k/KDiczwygQ1dQz9yFmENmeyays6zthlMipcmRn7rhcmQ7Mv1TAX8jDJHxTeTSyj4UkU8=
+  - secure: hMxvEBJVlLGYXW6z+NyWGgNrXN40nvIj3aEv5TxGphPA6hjyR6CQPcDEaVR/OIXphsb+94No80N/1zOOd4bgn3U8bpBXWaaSIC1XO0zDg6HHFcghRwNylTzJPnUE8iRdeJyHH5WnxBGq/Cd4Cb8zDuUPxZhpjNr4ttfJqIvbAYxYsLC9XaXs7Xma10REWsRIWdn8W4BHZi3et3UE53l51kc+UkietMKjDGZJXo2mrPtDoO7dRQfsLtDNTu3BlnoNZ2xtlTdUX40rNebmPPPPh63EfC4HkXQofdDGeKDeAe23DHd9Fei5NG3w0aCa+ysD9TFnm+cphCQZ15y33G1CZt6IVV1FnZPLtHrPC5fKmnt25TIFj04iVx/3MdbXIRfqYb87dIqRYwtoGMw0mQhQVtWApcyvVD6RG525luH7GpcB3BmlCHzDt5NuPid9T+FkKCP4I794d50jBUFq0VSvfdmeY2MOo7dH61EjVs2cCSHXBDV9tzysC8g2OG6wHEvMsXIpRIrYgg9miUFvJS1h0PjwuzoRPe5lqNMjqYOT9i8FIvm1oDNOokW8iD6E0j4sA9Ii/TimDVmYlKCQqns28MpvPCy3MBK/GRRYeCtJ5+CTIOfP4eg1rIm+BZopw9YPzwZWotdl09TxgKRwxiNdrNxY9PI9xyZSbfcs5l0gIBA=
 after_success:
-  - >
-      sbt publish
+- sbt dockerBuildAndPush publish
