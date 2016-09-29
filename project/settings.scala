@@ -61,8 +61,8 @@ object settings {
       },
     imageNames in docker := Seq(
       ImageName(
-        namespace = Some(organization.value),
-        repository = name.value,
+        namespace = Some(organization.value.filterNot(_ == '.')),
+        repository = organization.value.filterNot(_ == '.'),
         tag = Some("latest")
       )
     ),
