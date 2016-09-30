@@ -53,7 +53,7 @@ object Application {
       }
       val keys = List("name" -> params.get("name").map(s => s.head),
         "client-id" -> params.get("clientId").map(s => s.head)
-      ).filter(_._2.isDefined).toMap
+      ).filter{case (_, v) => v.isDefined}.toMap
 
       for {
         _ <- info(s"Requesting monitoring: '$domain' -> '$mtype'")

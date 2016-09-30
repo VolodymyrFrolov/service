@@ -12,6 +12,7 @@ import kafka.console.model.monitoring.{KafkaMetric, MBeanMetricInfo, MetricAttri
 import scala.math.Ordering.String
 import scalaz.\/
 import scalaz.concurrent.Task
+import scalaz._, Scalaz._
 
 final class AppMonitoringService extends MonitoringService {
   private val aggregates = MBeanInfoProvider.getAggregates
@@ -24,19 +25,19 @@ final class AppMonitoringService extends MonitoringService {
 
   private def definePotentialMetricsCandidates(domain: String, mtype: Option[String], keys: Map[String, Option[String]]): Task[List[MBeanMetricInfo]] = {
     mtype match {
-      case None => aggregates.map(_.filter(a => s"${a.domain}" == domain).toList)
+      case None => aggregates.map(_.filter(a => s"${a.domain}" === domain).toList)
       case Some(t) => aggregates.map(_.filter(a =>
-        if (keys.isEmpty) s"${a.domain}" == domain && s"${a.mtype}" == t
-        else s"${a.domain}" == domain && s"${a.mtype}" == t && s"${a.canonicalName}" == buildCanonicalKeysList(mtype, keys)).toList
+        if (keys.isEmpty) s"${a.domain}" === domain && s"${a.mtype}" === t
+        else s"${a.domain}" === domain && s"${a.mtype}" === t && s"${a.canonicalName}" === buildCanonicalKeysList(mtype, keys)).toList
       )
     }
   }
 
   private def buildCanonicalKeysList(mtype: Option[String], keys: Map[String, Option[String]]) = {
     (keys + ("type" -> mtype))
-      .toList.filter(a => a._2.isDefined)
-      .sortBy(a => a._1)
-      .map(a => a._1 + "=" + a._2.get)
+      .toList.filter{case (_, v) => v.isDefined}
+      .sortBy{case (k, _) => k}
+      .map{case (k, v) => k + "=" + v.get}
       .mkString(",")
   }
 

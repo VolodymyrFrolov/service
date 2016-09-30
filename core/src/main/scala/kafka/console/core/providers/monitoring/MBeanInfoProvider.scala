@@ -7,6 +7,7 @@ import extensions._
 import model.monitoring.MBeanMetricInfo
 
 import scalaz.concurrent.Task
+import scalaz._, Scalaz._
 
 object MBeanInfoProvider {
   def getAggregates = {
@@ -22,12 +23,12 @@ object MBeanInfoProvider {
 
   private def extractSortedCanonicalKeys(a: ObjectName) = {
     canonicalNameKeyListToMap(a.getCanonicalKeyPropertyListString)
-      .map(a => a._1 + "=" + a._2).mkString(",")
+      .map{case (k, v) => s"$k=$v"}.mkString(",")
   }
 
   private def getMetricType(a: ObjectName) = canonicalNameKeyListToMap(a.getCanonicalKeyPropertyListString)
-    .find(_._1 == "type")
-    .map(_._2)
+    .find{case (k, _) => k === "type"}
+    .map{case (_, v) => v}
     .getOrElse("unknown")
 
   private def canonicalNameKeyListToMap(canonicalName: String) = canonicalName.split(',').sorted.map { a =>
