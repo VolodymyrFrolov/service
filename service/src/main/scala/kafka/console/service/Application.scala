@@ -42,7 +42,7 @@ object Application {
         _ <- info(s"Requesting monitoring by domain: '$domain'")
         service <- monitoringService
         r <- service(GetMetricsByDomain(domain))
-        c <- r.fold(err => Task.now(Response(NotFound)), s => Ok(s))
+        c <- r.fold(err => NotFound(), s => Ok(s))
       } yield c
     }
 
@@ -59,7 +59,7 @@ object Application {
         _ <- info(s"Requesting monitoring: '$domain' -> '$mtype'")
         service <- monitoringService
         r <- service(if (keys.isEmpty) GetMetricsByType(domain, mtype) else GetMetrics(domain, mtype, keys, attributes))
-        c <- r.fold(err => Task.now(Response(NotFound)), s => Ok(s))
+        c <- r.fold(err => NotFound(), s => Ok(s))
       } yield c
     }
   }
