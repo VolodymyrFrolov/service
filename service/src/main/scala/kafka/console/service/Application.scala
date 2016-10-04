@@ -2,15 +2,15 @@ package kafka.console
 package service
 
 import journal.Logger
-import kafka.console.core.services.{GetTopicDetails, ListTopics, GetMetrics}
+import kafka.console.core.services._
 import org.http4s.Response
-import kafka.console.core.services.{GetPartition, ListPartitions, GetTopicDetails, ListTopics}
 import org.http4s.dsl._
 
 import scalaz.concurrent._
 import kafka.console.app._
 import org.http4s._
 
+import scala.collection.immutable.{List, Nil}
 import scalaz.concurrent.Task
 
 object Application {
@@ -36,18 +36,31 @@ object Application {
       } yield r
   }
 
-  private val monitoring = exec {
+  private val monitoring = raw {
+    case GET -> Root / "monitoring" / domain => {
+      for {
+        _ <- info(s"Requesting monitoring by domain: '$domain'")
+        service <- monitoringService
+        r <- service(GetMetricsByDomain(domain))
+        c <- r.fold(err => NotFound(), s => Ok(s))
+      } yield c
+    }
 
-    case GET -> Root / "monitoring" / domain / mtype :? NameMatcher(name) +& ClientIdMatcher(clientId) +& AttributesMatcher(attributes) => {
-      val attrs = attributes match {
+    case GET -> Root / "monitoring" / domain / mtype :? params => {
+      val attributes = params.get("attributes").map(s => s.head) match {
         case Some(a) => a.split(",").toList
         case _ => Nil
       }
+      val keys = List("name" -> params.get("name").map(s => s.head),
+        "client-id" -> params.get("clientId").map(s => s.head)
+      ).filter{case (_, v) => v.isDefined}.toMap
+
       for {
-        _ <- info(s"Requesting monitoring: '$domain' -> '$mtype' -> '$name' -> '$clientId'")
+        _ <- info(s"Requesting monitoring: '$domain' -> '$mtype'")
         service <- monitoringService
-        r <- service(GetMetrics(domain, mtype, Map("name" -> name, "client-id" -> clientId), attrs))
-      } yield r
+        r <- service(if (keys.isEmpty) GetMetricsByType(domain, mtype) else GetMetrics(domain, mtype, keys, attributes))
+        c <- r.fold(err => NotFound(), s => Ok(s))
+      } yield c
     }
   }
 
