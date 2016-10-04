@@ -8,8 +8,6 @@ cache:
   directories:
   - "$HOME/.ivy2/cache"
   - "$HOME/.sbt/boot/"
-before_install:
-- docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
 before_cache:
 - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
 - find $HOME/.sbt -name "*.lock" -delete
@@ -29,4 +27,4 @@ env:
   - secure: FSKQ6OH3WDugsJGFE2ovwssExggRGOD7y3x2azZvMhysLiCl9TIMXdOzoMVH9IEtRvLs6f8/drk9Q7SnVkRbaKSl0j9vRIt7x+V4bIwXOrtv+QnL0TmPN+7GoAbjHbjyUMsyatBRRp28PvPN6zWABDJKP+azXEEY6Z4ZqUqhauyc6cxas9WEUt8uS7iV+O8kacncJbiIuJldsu499lVgKZ/x7AmHaXvqWGYwVzYXB6yO7j5VJU7oVQn7xnsz27Sm5Hp//KvyHPAQ6IImIzf6fhbS2C623w67JwT9oF5/fcY0QypFqSrxL6yFWRjGYT+swHnUQfcKHGsgxQcqrfmzi6169zv3afvmNu5d4HIuoeJ7l/7ObBGxjeaZGzlpy5NSHLXiDhpn4UziC877hZdz2omCZPERaF/+Ubaa3QMQ3bwSWcUHN0/n+zgnNBuGBY5dzAC750PnyQGWnC8YjBuy1ZJYx/Y7oCqaA0vxoEWjR5LjzFIhwMu/4LF+7ctyiWdIVo8isRR1Vpn04aeHiJwFhAuL4fImlyLngZjY6SLH77V4hQPuGd1rbo93CTSPaeKunew/1DAwPE73DLqc4jm9KLX0mnnk3dku20x4c1tiHL/YUd4AC7+4MYCBGdZROCienJmVHYGaqI5CjLtNgICO560/SdwV7OJK2rGU/grj1wI=
   - secure: jIC6mbzP8CyDg6xiI+zs5WB3G7OfecV4lxd/UrTjXWnuICttxUk7IPigbM9ksZBRoW2GrJ6K8du9TndMONk6wWE/fXiBGrX6rWpS0nMwlUJkiSXPsTxAdkAU3nRNCWm8aLXzZ3/A8tpGFdii2yWFAYTDGRy+6LTiQsnrTgNfNI2DY6N0JLRCzNkv4kkkcaKrwzgRWpuCQyapMRyzY6iSMvw8lwLydrpDGbfo2iM3JgwBxtgz761/bsXTUfAlRBqp0jPCH9FRJF+eDwcTJAWTsymTpi871yPUZsB/zjc9E0J6/hkyJal0UrAh/h+aG9zF13pWvR4DoXX0UkNidQvB83qqiLiYy60Iv4uhxT6oQj1xQ/8MryHCsqOovDU1X5Y6quF6V1la6igcW7gagwRi/WDqISNFxn5FerV9by9CVkl5yDje6+NDhxEc1XuesYlRX4tmJPQlv/3RwDL4OouYu5uTjgwO1ltfzxkc2RtjRbbCHpCk3zw4L8HTHmQU4MxPBG2eHIzN9xWplIAD16ESiS2T406MT/zxejBt9wzZTE/0f/DygHH7eTDqnvxKYcxk5gasruXJwmgZzZ3qPmDM8EsSjb2BrXS+FRnk5ox6rahsawhqC/nxkhdmp/8WUPcKTbo39rROj/bXvIPnujhpx7WakCM9i3LZiW8/uOVKac4=
 after_success:
-- sbt dockerBuildAndPush publish
+- '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD && sbt dockerBuildAndPush publish'
